@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Выбери своего героя</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700&family=Exo+2:wght@300;400;600&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      --neon-cyan: #00f3ff;
+      --neon-purple: #d400ff;
+    }
+    
+    body {
+      font-family: 'Exo 2', sans-serif;
+      background: #010203;
+      color: #e0f8ff;
+      overflow-x: hidden;
+      min-height: 100vh;
+    }
+    
+    .orbitron { font-family: 'Orbitron', sans-serif; }
+    .neon-cyan { text-shadow: 0 0 25px var(--neon-cyan), 0 0 50px var(--neon-cyan); }
+    .neon-purple { text-shadow: 0 0 25px var(--neon-purple), 0 0 60px var(--neon-purple); }
+
+    .glass {
+      background: rgba(3, 6, 28, 0.85);
+      backdrop-filter: blur(20px);
+      border: 2px solid rgba(0, 243, 255, 0.4);
+    }
+
+    .hero-card {
+      opacity: 0;
+      height: 380px;                    /* Фиксированная высота для красивого вида */
+      position: relative;
+      overflow: hidden;
+      border-radius: 24px;
+      transition: all 0.5s ease;
+    }
+    
+    .hero-card:hover {
+      transform: translateY(-12px) scale(1.04);
+      border-color: #00f3ff;
+      box-shadow: 0 0 50px rgba(0, 243, 255, 0.6);
+    }
+
+    .hero-card img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.8s ease;
+    }
+
+    .hero-card:hover img {
+      transform: scale(1.12);
+    }
+
+    .hero-overlay {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 45%;
+      background: linear-gradient(transparent, rgba(1, 2, 15, 0.92));
+      display: flex;
+      align-items: flex-end;
+      padding: 28px 20px 24px;
+      z-index: 10;
+    }
+
+    .hero-name {
+      font-size: 1.45rem;
+      letter-spacing: 3px;
+      text-align: center;
+      width: 100%;
+    }
+
+    .scanline {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(transparent, rgba(0, 243, 255, 0.15), transparent);
+      animation: holographicScan 4s linear infinite;
+      opacity: 0;
+      transition: opacity 0.4s;
+      z-index: 5;
+      pointer-events: none;
+    }
+
+    .hero-card:hover .scanline {
+      opacity: 1;
+    }
+
+    @keyframes holographicScan {
+      0% { transform: translateY(-120%); }
+      100% { transform: translateY(300%); }
+    }
+
+    .code-float {
+      position: absolute;
+      color: #00f3ff;
+      opacity: 0.06;
+      font-size: 14px;
+      font-family: monospace;
+      pointer-events: none;
+      animation: floatCode linear infinite;
+    }
+
+    @keyframes floatCode {
+      from { transform: translateY(110vh) rotate(0deg); }
+      to { transform: translateY(-30vh) rotate(12deg); }
+    }
+  </style>
+</head>
+<body>
+
+  <div id="codeLines"></div>
+  <canvas id="bgCanvas" class="fixed inset-0 -z-10 opacity-30"></canvas>
+
+  <div class="min-h-screen py-16 px-6 relative z-10">
+    <div class="max-w-7xl mx-auto">
+      <div class="text-center mb-16">
+        <h1 class="text-6xl md:text-7xl orbitron neon-purple tracking-widest mb-4">
+          ВЫБЕРИ СВОЕГО ГЕРОЯ
+        </h1>
+        <p class="text-cyan-400 text-xl orbitron tracking-widest">NEURAL ACADEMY • 2026</p>
+      </div>
+
+      <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8" id="heroesGrid"></div>
+    </div>
+  </div>
+
+  <script>
+    const heroes = [
+      { name: "Арслан Сабиров", file: "arslan.html", img: "pic1.png" },
+      { name: "Риана Ибатова", file: "riana.html", img: "pic2.png" },
+      { name: "Амир Валиев",   file: "amir.html",   img: "pic3.png" },
+      { name: "Таир Назипов",  file: "tair.html",   img: "pic4.png" },
+      { name: "Богдан Сироткин", file: "bogdan.html", img: "pic5.png" },
+      { name: "Саид Сабирзянов", file: "said.html", img: "pic6.png" },
+      { name: "Тимур Ибатов",   file: "timur.html", img: "pic7.png" },
+      { name: "Мирослав Михайлов", file: "miroslav.html", img: "pic8.png" }
+    ];
+
+    function createFloatingCode() {
+      const container = document.getElementById('codeLines');
+      const lines = ['if (hero === true)', 'renderProfile()', 'system.activate()', 'levelUp()', 'console.log("LEGEND")'];
+      for (let i = 0; i < 25; i++) {
+        const el = document.createElement('div');
+        el.className = 'code-float';
+        el.textContent = lines[Math.floor(Math.random() * lines.length)];
+        el.style.left = Math.random() * 100 + 'vw';
+        el.style.animationDuration = (18 + Math.random() * 27) + 's';
+        el.style.animationDelay = '-' + Math.random() * 40 + 's';
+        container.appendChild(el);
+      }
+    }
+
+    function createNeuralNetwork() {
+      const canvas = document.getElementById('bgCanvas');
+      const ctx = canvas.getContext('2d');
+      let particles = [];
+      const maxDist = 140;
+
+      function resize() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+      }
+      resize();
+      window.addEventListener('resize', resize);
+
+      class Particle {
+        constructor() {
+          this.x = Math.random() * canvas.width;
+          this.y = Math.random() * canvas.height;
+          this.size = 2.2;
+          this.speedX = Math.random() * 0.4 - 0.2;
+          this.speedY = Math.random() * 0.4 - 0.2;
+        }
+        update() {
+          this.x += this.speedX; this.y += this.speedY;
+          if (this.x < 0 || this.x > canvas.width) this.speedX *= -1;
+          if (this.y < 0 || this.y > canvas.height) this.speedY *= -1;
+        }
+      }
+
+      for (let i = 0; i < 85; i++) particles.push(new Particle());
+
+      function animate() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        for (let p of particles) {
+          p.update();
+          ctx.fillStyle = '#00f3ff';
+          ctx.shadowBlur = 12; ctx.shadowColor = '#00f3ff';
+          ctx.beginPath(); ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2); ctx.fill();
+        }
+        for (let i = 0; i < particles.length; i++) {
+          for (let j = i + 1; j < particles.length; j++) {
+            const dx = particles[i].x - particles[j].x;
+            const dy = particles[i].y - particles[j].y;
+            const dist = Math.hypot(dx, dy);
+            if (dist < maxDist) {
+              ctx.strokeStyle = `rgba(0, 243, 255, ${0.12 * (1 - dist/maxDist)})`;
+              ctx.lineWidth = 1;
+              ctx.beginPath();
+              ctx.moveTo(particles[i].x, particles[i].y);
+              ctx.lineTo(particles[j].x, particles[j].y);
+              ctx.stroke();
+            }
+          }
+        }
+        requestAnimationFrame(animate);
+      }
+      animate();
+    }
+
+    function createHeroCards() {
+      const grid = document.getElementById('heroesGrid');
+      
+      heroes.forEach(hero => {
+        const card = document.createElement('a');
+        card.href = hero.file;
+        card.className = `hero-card glass block`;
+        
+        card.innerHTML = `
+          <img src="${hero.img}" alt="${hero.name}">
+          <div class="scanline"></div>
+          <div class="hero-overlay">
+            <h3 class="hero-name orbitron neon-cyan text-2xl tracking-widest">
+              ${hero.name.toUpperCase()}
+            </h3>
+          </div>
+        `;
+        grid.appendChild(card);
+      });
+    }
+
+    function animateCards() {
+      const cards = document.querySelectorAll('.hero-card');
+      gsap.to(cards, {
+        opacity: 1,
+        y: 0,
+        duration: 0.9,
+        stagger: 0.1,
+        ease: "power3.out",
+        delay: 0.3
+      });
+    }
+
+    window.onload = () => {
+      createFloatingCode();
+      createNeuralNetwork();
+      createHeroCards();
+      animateCards();
+    };
+  </script>
+</body>
+</html>

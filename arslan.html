@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Арслан Сабиров</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700&family=Exo+2:wght@300;400;600&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      --neon-cyan: #00f3ff;
+      --neon-purple: #d400ff;
+      --neon-green: #22ff88;
+    }
+    
+    body {
+      font-family: 'Exo 2', sans-serif;
+      background: #010203;
+      color: #e0f8ff;
+      overflow-x: hidden;
+    }
+    
+    .orbitron { font-family: 'Orbitron', sans-serif; }
+    .neon-cyan { text-shadow: 0 0 25px var(--neon-cyan), 0 0 50px var(--neon-cyan); }
+    .neon-purple { text-shadow: 0 0 25px var(--neon-purple), 0 0 50px var(--neon-purple); }
+    
+    .glass {
+      background: rgba(3, 6, 28, 0.95);
+      backdrop-filter: blur(22px);
+      border: 1px solid rgba(0, 243, 255, 0.35);
+    }
+
+    .holographic {
+      position: relative;
+      overflow: hidden;
+      border: 2px solid rgba(0, 243, 255, 0.5);
+    }
+    
+    .holographic::after {
+      content: '';
+      position: absolute;
+      inset: -50%;
+      background: linear-gradient(transparent, rgba(0, 243, 255, 0.3), transparent);
+      animation: holographicScan 4s linear infinite;
+    }
+
+    @keyframes holographicScan {
+      0% { transform: translateY(-150%); }
+      100% { transform: translateY(400%); }
+    }
+
+    /* Анимация загрузки */
+    .loader-bar {
+      height: 4px;
+      background: linear-gradient(to right, #00f3ff, #d400ff);
+      box-shadow: 0 0 20px #00f3ff, 0 0 40px #d400ff;
+      animation: loading 2.2s ease-in-out forwards;
+    }
+
+    @keyframes loading {
+      0% { width: 0%; }
+      100% { width: 100%; }
+    }
+
+    .code-float {
+      position: absolute;
+      color: #00f3ff;
+      opacity: 0.06;
+      font-size: 14px;
+      font-family: monospace;
+      pointer-events: none;
+      animation: floatCode linear infinite;
+    }
+
+    @keyframes floatCode {
+      from { transform: translateY(110vh) rotate(0deg); }
+      to { transform: translateY(-30vh) rotate(12deg); }
+    }
+  </style>
+</head>
+<body>
+
+  <div id="codeLines"></div>
+
+  <!-- AUDIO -->
+  <audio id="bgMusic" loop>
+    <source src="https://assets.mixkit.co/sfx/preview/251/251.wav" type="audio/wav">
+  </audio>
+  <audio id="scanSound">
+    <source src="https://assets.mixkit.co/sfx/preview/296/296.wav" type="audio/wav">
+  </audio>
+
+  <!-- INTRO -->
+  <div id="intro" class="fixed inset-0 bg-[#010203] z-50 flex items-center justify-center">
+    <canvas id="canvas" class="absolute inset-0"></canvas>
+    
+    <div class="relative z-10 text-center px-6 w-full max-w-lg">
+      <div class="holographic inline-block p-5 rounded-3xl mb-12">
+        <img id="heroImg" src="pic1.png" alt="Арслан Сабиров" 
+             class="w-80 md:w-96 rounded-2xl opacity-0 scale-75">
+      </div>
+      
+      <h1 class="text-5xl md:text-6xl orbitron tracking-widest neon-cyan mb-6">LOADING...</h1>
+      
+      <div class="mb-8">
+   
+        <div class="h-1.5 bg-gray-900 rounded-full overflow-hidden">
+          <div class="loader-bar w-0"></div>
+        </div>
+      </div>
+      
+      <p class="text-cyan-500 text-sm font-mono" id="status">CONNECTING TO HERO CORE...</p>
+    </div>
+  </div>
+
+  <!-- MAIN CONTENT -->
+  <div id="main" class="hidden min-h-screen py-16 px-6">
+    <canvas id="bgCanvas" class="fixed inset-0 -z-10 opacity-20"></canvas>
+    
+    <div class="max-w-7xl mx-auto">
+      <div class="text-center mb-12">
+        <h2 class="text-5xl orbitron neon-purple">SABIROV ARSLAN</h2>
+        <p class="text-cyan-400 text-lg mt-2">Отчёт по курсу создания сайтов</p>
+      </div>
+
+      <div class="grid lg:grid-cols-2 gap-12 items-start">
+        <!-- Левая колонка — Изображение -->
+        <div class="flex justify-center lg:justify-end">
+          <div class="holographic p-6 rounded-3xl sticky top-8">
+            <img src="pic1.png" alt="Арслан Сабиров" 
+                 class="w-full max-w-md lg:max-w-lg rounded-2xl shadow-2xl transition-transform hover:scale-[1.02] duration-700">
+          </div>
+        </div>
+
+        <!-- Правая колонка — Текст -->
+        <div class="space-y-10">
+          <div class="glass rounded-3xl p-10">
+            <h3 class="text-3xl orbitron text-cyan-400 mb-8">ОТЧЁТ СИСТЕМЫ</h3>
+            <p class="text-lg leading-relaxed mb-10">
+              Арслан Сабиров успешно прошёл курс по созданию сайтов на HTML, CSS и Tilda. 
+              Арслан — очень активный и креативный мальчик, который любит экспериментировать и находить нестандартные решения.
+            </p>
+
+            <div class="grid md:grid-cols-2 gap-10">
+              <div>
+                <h4 class="text-emerald-400 text-xl mb-5 orbitron border-l-4 border-emerald-400 pl-4">СИЛЬНЫЕ СТОРОНЫ</h4>
+                <ul class="space-y-3 text-gray-200">
+                  <li>✔ Отличное владение Tilda</li>
+                  <li>✔ Хорошая база HTML и CSS</li>
+                  <li>✔ Высокая креативность в дизайне</li>
+                </ul>
+              </div>
+              <div>
+                <h4 class="text-amber-400 text-xl mb-5 orbitron border-l-4 border-amber-400 pl-4">РЕКОМЕНДАЦИИ</h4>
+                <ul class="space-y-3 text-gray-200">
+                  <li>→ Соблюдать техническое задание</li>
+                  <li>→ Улучшать чистоту кода</li>
+                  <li>→ Переходить к сложным многостраничным проектам</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <div class="glass rounded-3xl p-10">
+            <h3 class="text-3xl orbitron text-purple-400 mb-8">Поздравляю с завершением курса, Герой!</h3>
+            <div class="text-lg leading-relaxed space-y-6">
+              <p class="text-cyan-300 text-xl">Арслан!</p>
+              <p>Ты обладаешь редким сочетанием мощной энергии, креативности и желания создавать что-то необычное.</p>
+              <p>Теперь перед тобой стоит важная миссия — научиться сочетать свою яркую фантазию с дисциплиной, чистым кодом и вниманием к деталям.</p>
+              <p class="text-emerald-400 font-bold text-xl mt-8">Когда эти качества соединятся — ты станешь по-настоящему непобедимым разработчиком.</p>
+              <p class="text-4xl orbitron text-center mt-12 text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-500">
+                Успешных проектов, верю в тебя!
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="text-center mt-20 text-xs text-cyan-500/30 orbitron tracking-widest">
+        ALGORITMIKA • NABIULLINA GULFIYA • 2026
+      </div>
+    </div>
+  </div>
+
+
+
+  <script>
+    let musicOn = true;
+    const bgMusic = document.getElementById('bgMusic');
+    const scanSound = document.getElementById('scanSound');
+
+    function createNeuralNetwork(canvasId, density) {
+      const canvas = document.getElementById(canvasId);
+      const ctx = canvas.getContext('2d');
+      let particles = [];
+      const maxDist = 130;
+
+      function resize() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+      }
+      resize();
+      window.addEventListener('resize', resize);
+
+      class Particle {
+        constructor() {
+          this.x = Math.random() * canvas.width;
+          this.y = Math.random() * canvas.height;
+          this.size = 2;
+          this.speedX = Math.random() * 0.5 - 0.25;
+          this.speedY = Math.random() * 0.5 - 0.25;
+        }
+        update() {
+          this.x += this.speedX;
+          this.y += this.speedY;
+          if (this.x < 0 || this.x > canvas.width) this.speedX *= -1;
+          if (this.y < 0 || this.y > canvas.height) this.speedY *= -1;
+        }
+      }
+
+      for (let i = 0; i < density; i++) particles.push(new Particle());
+
+      function animate() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        for (let p of particles) {
+          p.update();
+          ctx.fillStyle = '#00f3ff';
+          ctx.shadowBlur = 15;
+          ctx.shadowColor = '#00f3ff';
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+          ctx.fill();
+        }
+        for (let i = 0; i < particles.length; i++) {
+          for (let j = i + 1; j < particles.length; j++) {
+            const dx = particles[i].x - particles[j].x;
+            const dy = particles[i].y - particles[j].y;
+            const dist = Math.hypot(dx, dy);
+            if (dist < maxDist) {
+              ctx.strokeStyle = `rgba(0, 243, 255, ${0.18 * (1 - dist/maxDist)})`;
+              ctx.lineWidth = 1.2;
+              ctx.beginPath();
+              ctx.moveTo(particles[i].x, particles[i].y);
+              ctx.lineTo(particles[j].x, particles[j].y);
+              ctx.stroke();
+            }
+          }
+        }
+        requestAnimationFrame(animate);
+      }
+      animate();
+    }
+
+    function createFloatingCode() {
+      const container = document.getElementById('codeLines');
+      const lines = ['if (creative === true)', 'while(motivation > 0)', 'renderHero()', 'system.activate()', 'function levelUp()', 'console.log("LEGEND")'];
+      for (let i = 0; i < 22; i++) {
+        const el = document.createElement('div');
+        el.className = 'code-float';
+        el.textContent = lines[Math.floor(Math.random() * lines.length)];
+        el.style.left = Math.random() * 100 + 'vw';
+        el.style.animationDuration = (20 + Math.random() * 25) + 's';
+        el.style.animationDelay = '-' + Math.random() * 35 + 's';
+        container.appendChild(el);
+      }
+    }
+
+    function startIntro() {
+      createNeuralNetwork('canvas', 130);
+      createNeuralNetwork('bgCanvas', 65);
+      createFloatingCode();
+
+      scanSound.currentTime = 0;
+      scanSound.play().catch(() => {});
+
+      // Появление изображения
+      gsap.to("#heroImg", { 
+        opacity: 1, 
+        scale: 1, 
+        duration: 1.4, 
+        ease: "power4.out", 
+        delay: 0.3 
+      });
+
+      // Меняем статусы во время загрузки
+      const statuses = [
+        "CONNECTING TO HERO CORE...",
+        "SCANNING CREATIVE MATRIX...",
+        "LOADING NEURAL PROFILE...",
+        "PROTOCOL ACTIVATED"
+      ];
+      
+      let i = 0;
+      const statusEl = document.getElementById('status');
+      
+      const statusInterval = setInterval(() => {
+        statusEl.textContent = statuses[i];
+        i = (i + 1) % statuses.length;
+      }, 700);
+
+      // Завершение загрузки
+      setTimeout(() => {
+        clearInterval(statusInterval);
+        statusEl.textContent = "SYSTEM ONLINE ✓";
+        statusEl.classList.add("text-emerald-400");
+
+        setTimeout(() => {
+          document.getElementById('intro').style.transition = 'opacity 1s';
+          document.getElementById('intro').style.opacity = '0';
+          
+          setTimeout(() => {
+            document.getElementById('intro').classList.add('hidden');
+            document.getElementById('main').classList.remove('hidden');
+            
+            bgMusic.volume = 0.25;
+            bgMusic.play().catch(() => {});
+          }, 900);
+        }, 600);
+      }, 3200); // Общее время intro ≈ 3.8 секунды
+    }
+
+    function toggleMusic() {
+      musicOn = !musicOn;
+      const btn = document.getElementById('musicBtn');
+      if (musicOn) {
+        bgMusic.play();
+        btn.innerHTML = `<span id="musicStatus">♪ MUSIC ON</span>`;
+      } else {
+        bgMusic.pause();
+        btn.innerHTML = `<span id="musicStatus">♪ MUSIC OFF</span>`;
+      }
+    }
+
+    function restartProtocol() {
+      location.reload();
+    }
+
+    window.onload = startIntro;
+  </script>
+</body>
+</html>
